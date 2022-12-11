@@ -51,7 +51,7 @@ app.post("/signUp", async function(request, response){
 
     // if exists send username already exists else add the new user
     if(userFromDB){
-      response.status(400).send("User name already exists");
+      response.status(400).send({msg:"User name already exists"});
     }else{
       // password is hashed
       const hashedPassword = await generateHashedPassword(password); 
@@ -62,7 +62,7 @@ app.post("/signUp", async function(request, response){
                                               "email" : email,
                                               "password" : hashedPassword
                                            })
-      response.send("Sign up successful")
+      response.send({msg:"Sign up successful"})
     }   
 })
 
