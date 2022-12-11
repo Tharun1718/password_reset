@@ -1,7 +1,4 @@
-const date = new Date();
 
-const expriesin = date.setHours(date.getHours());
+const expiresin = new Date();
 
-console.log(expriesin);
-
-console.log(date.setHours(date.getHours()+1))
+console.log(expiresin.setHours(expiresin.getHours() + 1))

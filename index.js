@@ -1,14 +1,17 @@
 import bcrypt from "bcrypt";
 import express from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import randomstring from "randomstring";
 import nodemailer, { createTransport } from "nodemailer";
+import * as dotenv from 'dotenv';
+dotenv.config()
+
 const app = express();
 
-const PORT = 4000;
+const PORT = process.env.PORT;
 
 // connection to mongodb
-const MONGO_URL= "mongodb://127.0.0.1"
+const MONGO_URL= process.env.MONGO_URL
 
 async function createConnection(){
     const client=new MongoClient(MONGO_URL);
@@ -79,7 +82,7 @@ app.post("/login", async function( request, response) {
     } 
   } 
 })
-//const randomString = randomstring.generate()
+
 // forgot password
 app.post("/forgotPassword", async function(request, response){
   const {email} = request.body;
@@ -99,13 +102,13 @@ app.post("/forgotPassword", async function(request, response){
     let transporter = nodemailer.createTransport({
        service: "gmail",
        auth : {
-          user : "tharunmano1170@gmail.com",
+          user : process.env.USER_NAME,
           pass : "xxjonkhamtoefulk"
        }
     })
     // mail details
     let mailDetails = {
-            from: 'tharunmano1170@gmail.com',
+            from: 'no-reply@noreplay.com',
             to: email,
             subject: 'Reset Password',
             text : "HI this is a testing mail"
@@ -138,6 +141,49 @@ app.post("/forgotPassword", async function(request, response){
                                              }
                                              )
     response.send("Password reset link is sent to your mail")
+  }
+})
+
+// verify whether the random string matches or not
+app.post("/verifyToken", async function(request, response) {
+  const {id, token} = request.body;
+  //get the user from the database
+  const userFromDB = await client.db("node").collection("users").findOne({_id:ObjectId(id)})
+  // the current time when the link is clicked
+  const currentTime = new Date();
+  currentTime.setHours(currentTime.getHours())
+  
+  try{
+    if(currentTime <= userFromDB.resetPasswordExpiresOn){
+      if(token === userFromDB.resetPaswordToken){
+        response.send({msg: "Changing Password is approved"})
+      }else{
+        response.status(400).send({msg:"Token is not valid"})
+      }
+    }else{
+      response.status(400).send({msg:"Link expired"})
+    }
+  }catch(err){
+    response.status(400).send({msg:"Something went wrong"})
+  }
+
+})
+
+app.post("/changePassword", async function(request, response){
+  const {id, password} = request.body;
+
+  try{
+  const hashedPassword = await generateHashedPassword(password)
+  const userFromDB = await client.db("node")
+                                 .collection("users")
+                                 .findOneAndUpdate(
+                                  { _id: ObjectId(id) },
+                                  { $set: {password: hashedPassword } } 
+                                  )
+
+    response.send("Password has been updated successfully")                              
+  }catch(err){
+    response.status(400).send({msg: "Error"})
   }
 })
 
