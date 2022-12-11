@@ -3,6 +3,7 @@ import express from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import randomstring from "randomstring";
 import nodemailer, { createTransport } from "nodemailer";
+import cors from "cors";
 import * as dotenv from 'dotenv';
 dotenv.config()
 
@@ -30,6 +31,9 @@ app.get("/", function (request, response) {
 // inbuilt middleware to convert data in the body to json format
 app.use(express.json())
 
+// to connect with react
+app.use(cors())
+
 // function to generate hashed password
 async function generateHashedPassword(password){
   const NO_OF_ROUNDS = 10;
@@ -39,7 +43,7 @@ async function generateHashedPassword(password){
 }
 
 // sign up 
-app.post("/signup", async function(request, response){
+app.post("/signUp", async function(request, response){
     const {userName, email,password} = request.body; 
     // console.log(userName, email, password);
     //find out whether the user already exists in the database
