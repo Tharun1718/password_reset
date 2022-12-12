@@ -95,7 +95,7 @@ app.post("/forgotPassword", async function(request, response){
 
   // if email is not present send error message
   if(!emailFromDB){
-    response.status(400).send({message: "Please enter a valid email"});
+    response.status(400).send({msg: "Please enter a valid email"});
   }else{
     //generate a random string if email is valid
     const randomStr = randomstring.generate();
@@ -144,7 +144,7 @@ app.post("/forgotPassword", async function(request, response){
                                                 }
                                              }
                                              )
-    response.send("Password reset link is sent to your mail")
+    response.send({msg:"Password reset link is sent to your mail"})
   }
 })
 
