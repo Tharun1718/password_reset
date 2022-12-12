@@ -100,9 +100,9 @@ app.post("/forgotPassword", async function(request, response){
     //generate a random string if email is valid
     const randomStr = randomstring.generate();
 
-    const resetLink = `${process.env.FRONTEND_URL})/resetPassword/${userFromDB._id}/${randomStr}`
+    const resetLink = `${process.env.FRONTEND_URL}/resetPassword/${userFromDB._id}/${randomStr}`
     // mail sent using nodemailer
-
+    console.log(resetLink)
     // create transporter
     let transporter = nodemailer.createTransport({
        service: "gmail",
