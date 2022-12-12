@@ -91,15 +91,16 @@ app.post("/login", async function( request, response) {
 app.post("/forgotPassword", async function(request, response){
   const {email} = request.body;
   // check whether the email is present in the database
-  const emailFromDB = await client.db("node").collection("users").findOne({"email": email});
+  const userFromDB = await client.db("node").collection("users").findOne({"email": email});
 
   // if email is not present send error message
-  if(!emailFromDB){
+  if(!userFromDB){
     response.status(400).send({msg: "Please enter a valid email"});
   }else{
     //generate a random string if email is valid
     const randomStr = randomstring.generate();
 
+    const resetLink = `${process.env.FRONTEND_URL})/resetPassword/${userFromDB._id}/${randomStr}`
     // mail sent using nodemailer
 
     // create transporter
@@ -115,8 +116,8 @@ app.post("/forgotPassword", async function(request, response){
             from: 'no-reply@noreplay.com',
             to: email,
             subject: 'Reset Password',
-            text : "HI this is a testing mail"
-            // html: `<h4>Hello User,</h4><br><p> You can reset the password by clicking the link below.</p><br><u><a href=${linkForUser}>${linkForUser}</a></u>`
+            html: `<h4>Hello User,</h4><br><p> You can reset the password by clicking the link below.</p>
+                      <br><u><a href=${resetLink}>${resetLink}</a></u>`
         }
 
     // send mail
