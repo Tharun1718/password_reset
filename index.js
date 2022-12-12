@@ -115,7 +115,7 @@ app.post("/forgotPassword", async function(request, response){
     let mailDetails = {
             from: 'no-reply@noreplay.com',
             to: email,
-            subject: 'Reset Password',
+            subject: 'Reset Password Link',
             html: `<h4>Hello User,</h4><br><p> You can reset the password by clicking the link below.</p>
                       <br><u><a href=${resetLink}>${resetLink}</a></u>`
         }
